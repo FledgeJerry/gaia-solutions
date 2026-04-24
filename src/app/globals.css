@@ -320,7 +320,7 @@ select option { background: var(--color-surface-raised); color: var(--color-text
 .site-nav__drawer { display: none; }
 
 /* ---- Responsive ---- */
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .site-nav {
     flex-wrap: wrap;
     height: auto;
