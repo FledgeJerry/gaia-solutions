@@ -51,6 +51,17 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section>
+        <span className="eyebrow">Infrastructure That Means It</span>
+        <h2 style={{ marginBottom: "1rem" }}>This Platform Runs on a Computer in Our Building</h2>
+        <p style={{ marginBottom: "1rem" }}>
+          gaia.solutions doesn&apos;t run on a server farm owned by Amazon or Google. It runs on a Raspberry Pi sitting inside The Fledge at 1300 Eureka Street in Lansing, MI. Your data stays in our building, on hardware we own.
+        </p>
+        <p>
+          That&apos;s not a quirk. It&apos;s a statement. If we&apos;re going to ask you to build something you actually own, we should practice what we preach.
+        </p>
+      </section>
+
     </div>
   );
 }
