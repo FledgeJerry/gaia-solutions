@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <SessionProvider>
           <Nav />
-          <main style={{ flex: 1, maxWidth: "900px", margin: "0 auto", width: "100%", padding: "2rem 1.5rem" }}>
+          <main style={{ flex: 1, maxWidth: "1100px", margin: "0 auto", width: "100%", padding: "2rem 1.5rem" }}>
             {children}
           </main>
           <footer className="site-footer">

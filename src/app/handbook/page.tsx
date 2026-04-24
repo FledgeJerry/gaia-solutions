@@ -339,8 +339,8 @@ export default function HandbookPage() {
             <div key={field.id} className="card" id={field.id}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem", flexWrap: "wrap" }}>
                 <span className="badge badge--gold">{field.id}</span>
-                <span className={`badge ${field.type === "N" ? "badge--blue" : "badge--teal"}`}>
-                  {field.type === "N" ? "Narrative" : "Numeric"}
+                <span className={`badge ${field.type === "N" ? "badge--blue" : field.type === "select" ? "badge--blue" : "badge--teal"}`}>
+                  {field.type === "N" ? "Narrative" : field.type === "select" ? "Select" : "Numeric"}
                 </span>
                 <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
                   Feeds into: {field.feedsInto.join(", ")}
@@ -351,7 +351,43 @@ export default function HandbookPage() {
                 {field.question}
               </label>
 
-              {field.multiline ? (
+              {field.type === "select" && field.options ? (() => {
+                const current = entries[field.id] ?? "";
+                const isOther = current.startsWith("Other: ") || (current === "Other");
+                const selectVal = isOther ? "Other" : (field.options.includes(current) ? current : "");
+                const otherText = isOther ? current.replace(/^Other: ?/, "") : "";
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <select
+                      id={field.id}
+                      value={selectVal}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "Other") {
+                          handleChange(field.id, "Other");
+                        } else {
+                          handleChange(field.id, val);
+                          setTimeout(() => save(field.id, val), 0);
+                        }
+                      }}
+                    >
+                      <option value="">Select an option…</option>
+                      {field.options.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                    {isOther && (
+                      <input
+                        type="text"
+                        value={otherText}
+                        onChange={(e) => handleChange(field.id, e.target.value ? `Other: ${e.target.value}` : "Other")}
+                        onBlur={() => handleBlur(field.id)}
+                        placeholder="Describe your legal structure…"
+                      />
+                    )}
+                  </div>
+                );
+              })() : field.multiline ? (
                 <textarea
                   id={field.id}
                   value={entries[field.id] ?? ""}

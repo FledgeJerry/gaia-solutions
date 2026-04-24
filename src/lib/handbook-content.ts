@@ -1,4 +1,4 @@
-export type FieldType = "N" | "#";
+export type FieldType = "N" | "#" | "select";
 
 export type HandbookField = {
   id: string;
@@ -7,6 +7,7 @@ export type HandbookField = {
   question: string;
   example: string;
   multiline?: boolean;
+  options?: string[];
 };
 
 export type HandbookSection = {
@@ -805,11 +806,15 @@ export const HANDBOOK: HandbookSection[] = [
       },
       {
         id: "P11-02",
-        type: "N",
+        type: "select",
         feedsInto: ["Governance Summary", "Executive Summary"],
-        question: "What legal entity type will you use? (Worker cooperative corporation, LLC with cooperative operating agreement, etc.)",
-        example: "Michigan Worker Cooperative Corporation under the Michigan Cooperative Corporation Act. This gives us the clearest legal protection for our one-member, one-vote structure and patronage distribution.",
-        multiline: true,
+        question: "What legal entity type will you use?",
+        example: "Michigan LLC (MCL 450.4101) with Cooperative Operating Agreement",
+        options: [
+          "Michigan LLC (MCL 450.4101) with Cooperative Operating Agreement",
+          "Michigan Business Corporation (MCL 450.1101 et seq.) with Cooperative-Style Bylaws",
+          "Other",
+        ],
       },
       {
         id: "P11-03",
