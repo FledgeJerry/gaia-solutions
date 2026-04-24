@@ -309,6 +309,11 @@ export default function HandbookPage() {
                 <span style={{ fontSize: "0.8rem", color: isActive ? "var(--color-limestone)" : "var(--color-text-secondary)", display: "block", lineHeight: 1.3 }}>
                   {s.title.split(":")[0]}
                 </span>
+                {s.title.includes(":") && (
+                  <span style={{ fontSize: "0.72rem", color: isActive ? "var(--color-text-secondary)" : "var(--color-text-muted)", display: "block", lineHeight: 1.3 }}>
+                    {s.title.split(":")[1].trim()}
+                  </span>
+                )}
                 <span style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", marginTop: "0.2rem", display: "block" }}>
                   {done}/{s.fields.length} fields
                 </span>
