@@ -7,6 +7,7 @@ import { HANDBOOK } from "@/lib/handbook-content";
 import type { HandbookField } from "@/lib/handbook-content";
 
 type Coop = { id: string; name: string; role: string };
+type Member = { id: string; role: string; user: { id: string; name: string | null; email: string } };
 type Entries = Record<string, string>;
 type SaveState = Record<string, "saving" | "saved" | "error">;
 
@@ -23,6 +24,11 @@ export default function HandbookPage() {
   const [activeSection, setActiveSection] = useState(HANDBOOK[0].id);
   const [showExample, setShowExample] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [showTeam, setShowTeam] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteError, setInviteError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/login"); return; }
@@ -39,6 +45,7 @@ export default function HandbookPage() {
   useEffect(() => {
     if (!coopId) return;
     setEntries({});
+    setMembers([]);
     fetch(`/api/handbook?coopId=${coopId}`)
       .then((r) => r.json())
       .then((data: { fieldId: string; value: string }[]) => {
@@ -46,7 +53,40 @@ export default function HandbookPage() {
         for (const e of data) map[e.fieldId] = e.value;
         setEntries(map);
       });
+    fetch(`/api/coops/${coopId}/members`)
+      .then((r) => r.json())
+      .then((data: Member[]) => setMembers(data));
   }, [coopId]);
+
+  async function handleInvite(e: React.FormEvent) {
+    e.preventDefault();
+    if (!inviteEmail.trim() || !coopId) return;
+    setInviting(true);
+    setInviteError("");
+    const res = await fetch(`/api/coops/${coopId}/members`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: inviteEmail.trim() }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setInviteError(data.error ?? "Something went wrong");
+    } else {
+      setMembers((prev) => [...prev, data]);
+      setInviteEmail("");
+    }
+    setInviting(false);
+  }
+
+  async function handleRemoveMember(memberId: string) {
+    if (!coopId) return;
+    await fetch(`/api/coops/${coopId}/members`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ memberId }),
+    });
+    setMembers((prev) => prev.filter((m) => m.id !== memberId));
+  }
 
   async function handleCreateCoop(e: React.FormEvent) {
     e.preventDefault();
@@ -194,7 +234,52 @@ export default function HandbookPage() {
             >
               + New
             </button>
+            <button
+              onClick={() => setShowTeam((v) => !v)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", fontSize: "0.75rem", padding: 0, fontFamily: "var(--font-sans)" }}
+            >
+              Team
+            </button>
           </div>
+
+          {showTeam && (
+            <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              {members.map((m) => (
+                <div key={m.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: "0.75rem", fontWeight: 600, margin: 0, color: "var(--color-limestone)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {m.user.name ?? m.user.email}
+                    </p>
+                    <p style={{ fontSize: "0.7rem", color: "var(--color-text-muted)", margin: 0, textTransform: "lowercase" }}>{m.role}</p>
+                  </div>
+                  {m.role !== "OWNER" && activeCoop?.role === "OWNER" && (
+                    <button
+                      onClick={() => handleRemoveMember(m.id)}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", fontSize: "0.7rem", padding: 0, fontFamily: "var(--font-sans)", flexShrink: 0 }}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              {activeCoop?.role === "OWNER" && (
+                <form onSubmit={handleInvite} style={{ display: "flex", gap: "0.4rem", marginTop: "0.25rem" }}>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => { setInviteEmail(e.target.value); setInviteError(""); }}
+                    placeholder="Email address"
+                    style={{ flex: 1, fontSize: "0.75rem", padding: "0.3rem 0.5rem" }}
+                  />
+                  <button type="submit" className="btn btn--primary btn--sm" disabled={inviting} style={{ fontSize: "0.7rem", padding: "0.3rem 0.6rem" }}>
+                    {inviting ? "…" : "Add"}
+                  </button>
+                </form>
+              )}
+              {inviteError && <p style={{ fontSize: "0.72rem", color: "#e07070", margin: 0 }}>{inviteError}</p>}
+            </div>
+          )}
         </div>
 
         <p style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: "0.75rem" }}>
