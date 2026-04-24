@@ -309,6 +309,61 @@ export const HANDBOOK: HandbookSection[] = [
       },
     ],
   },
+  {
+    id: "P4",
+    title: "Part Four: Channels — How Value Reaches People",
+    description: "The best service in the world doesn't matter if the people who need it can't find it. A channel is how your product or service gets from your co-op to the person who needs it — and how potential member-owners and partners find you.",
+    fields: [
+      {
+        id: "P4-01",
+        type: "N",
+        feedsInto: ["Canvas", "Startup Budget"],
+        question: "What is your primary channel — the main way customers and potential members find you? Describe it specifically.",
+        example: "Referrals from the Area Agency on Aging, hospital social workers, and Medicaid case managers. These professionals are always looking for reliable home care options and will refer families directly to us.",
+        multiline: true,
+      },
+      {
+        id: "P4-02",
+        type: "N",
+        feedsInto: ["Canvas", "Startup Budget"],
+        question: "What is your second channel? How does it complement the first?",
+        example: "Community presence — showing up at faith communities, neighborhood association meetings, and Fledge events. Builds trust and name recognition in the neighborhoods we serve.",
+        multiline: true,
+      },
+      {
+        id: "P4-03",
+        type: "N",
+        feedsInto: ["Canvas"],
+        question: "What is your third channel? Why does this one make sense for your co-op?",
+        example: "A simple website and Facebook page. Many families search online first. We don't need to be fancy — we need to be findable and credible.",
+        multiline: true,
+      },
+      {
+        id: "P4-04",
+        type: "#",
+        feedsInto: ["Startup Budget", "P&L", "Cash Flow"],
+        question: "What is your estimated total monthly cost to operate all your channels? (Marketing, advertising, website hosting, event fees, etc.)",
+        example: "$400/month — $150 website/hosting, $150 community events and printed materials, $100 social media boosting",
+        multiline: false,
+      },
+      {
+        id: "P4-05",
+        type: "N",
+        feedsInto: ["Governance Summary", "Ecosystem Map"],
+        question: "Which channel is most likely to reach future worker-owners — people who might want to join your co-op as member-owners?",
+        example: "Word of mouth through existing caregivers and community organizations. The best recruitment is a worker-owner telling their colleague: \"I own my job now. Come join us.\"",
+        multiline: true,
+      },
+      {
+        id: "P4-06",
+        type: "N",
+        feedsInto: ["Ecosystem Map", "Canvas"],
+        question: "How will you connect with and through other co-ops in the ecosystem?",
+        example: "Monthly connection with Fledge co-ops. Cross-referrals with Urbandale Farm. Shared member recruitment with Sunshine House. Attending Project 2026 community events together.",
+        multiline: true,
+      },
+    ],
+  },
 ];
 
 export function getSection(id: string): HandbookSection | undefined {
