@@ -6,12 +6,18 @@ import { useRouter } from "next/navigation";
 import { HANDBOOK } from "@/lib/handbook-content";
 import type { HandbookField } from "@/lib/handbook-content";
 
+type Coop = { id: string; name: string; role: string };
 type Entries = Record<string, string>;
 type SaveState = Record<string, "saving" | "saved" | "error">;
 
 export default function HandbookPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
+  const [coops, setCoops] = useState<Coop[]>([]);
+  const [coopId, setCoopId] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newCoopName, setNewCoopName] = useState("");
+  const [creating, setCreating] = useState(false);
   const [entries, setEntries] = useState<Entries>({});
   const [saveState, setSaveState] = useState<SaveState>({});
   const [activeSection, setActiveSection] = useState(HANDBOOK[0].id);
@@ -21,30 +27,59 @@ export default function HandbookPage() {
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/login"); return; }
     if (status !== "authenticated") return;
-    fetch("/api/handbook")
+    fetch("/api/coops")
+      .then((r) => r.json())
+      .then((data: Coop[]) => {
+        setCoops(data);
+        if (data.length === 1) setCoopId(data[0].id);
+        setLoading(false);
+      });
+  }, [status, router]);
+
+  useEffect(() => {
+    if (!coopId) return;
+    setEntries({});
+    fetch(`/api/handbook?coopId=${coopId}`)
       .then((r) => r.json())
       .then((data: { fieldId: string; value: string }[]) => {
         const map: Entries = {};
         for (const e of data) map[e.fieldId] = e.value;
         setEntries(map);
-        setLoading(false);
       });
-  }, [status, router]);
+  }, [coopId]);
+
+  async function handleCreateCoop(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newCoopName.trim()) return;
+    setCreating(true);
+    const res = await fetch("/api/coops", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newCoopName }),
+    });
+    const coop: Coop = await res.json();
+    setCoops((prev) => [...prev, coop]);
+    setCoopId(coop.id);
+    setShowCreate(false);
+    setNewCoopName("");
+    setCreating(false);
+  }
 
   const save = useCallback(async (fieldId: string, value: string) => {
+    if (!coopId) return;
     setSaveState((s) => ({ ...s, [fieldId]: "saving" }));
     try {
       await fetch("/api/handbook", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fieldId, value }),
+        body: JSON.stringify({ coopId, fieldId, value }),
       });
       setSaveState((s) => ({ ...s, [fieldId]: "saved" }));
       setTimeout(() => setSaveState((s) => { const n = { ...s }; delete n[fieldId]; return n; }), 2000);
     } catch {
       setSaveState((s) => ({ ...s, [fieldId]: "error" }));
     }
-  }, []);
+  }, [coopId]);
 
   function handleChange(fieldId: string, value: string) {
     setEntries((e) => ({ ...e, [fieldId]: value }));
@@ -54,21 +89,114 @@ export default function HandbookPage() {
     save(fieldId, entries[fieldId] ?? "");
   }
 
+  if (status === "loading" || loading) return <p className="text-muted">Loading…</p>;
+
+  // Create form — no coops yet, or user clicked "+ New"
+  if (coops.length === 0 || showCreate) {
+    return (
+      <div style={{ maxWidth: "480px" }}>
+        <span className="eyebrow">Get Started</span>
+        <h1 style={{ marginBottom: "0.5rem" }}>Name your co-op</h1>
+        <p style={{ marginBottom: "2rem", color: "var(--color-text-secondary)" }}>
+          Give your co-op a working name — you can always change it later.
+        </p>
+        <form onSubmit={handleCreateCoop} style={{ display: "flex", gap: "0.75rem" }}>
+          <input
+            type="text"
+            value={newCoopName}
+            onChange={(e) => setNewCoopName(e.target.value)}
+            placeholder="e.g. Neighbors Care Cooperative"
+            style={{ flex: 1 }}
+            autoFocus
+          />
+          <button type="submit" className="btn btn--primary" disabled={creating || !newCoopName.trim()}>
+            {creating ? "Creating…" : "Start"}
+          </button>
+        </form>
+        {coops.length > 0 && (
+          <button
+            onClick={() => setShowCreate(false)}
+            style={{ marginTop: "1rem", background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", fontFamily: "var(--font-sans)" }}
+          >
+            ← Back
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Picker — multiple coops, none selected
+  if (coops.length > 1 && !coopId) {
+    return (
+      <div style={{ maxWidth: "480px" }}>
+        <span className="eyebrow">Your Co-ops</span>
+        <h1 style={{ marginBottom: "1.5rem" }}>Which handbook?</h1>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+          {coops.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setCoopId(c.id)}
+              style={{
+                background: "var(--color-surface-raised)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "8px",
+                padding: "1rem",
+                textAlign: "left",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              <p style={{ fontWeight: 600, margin: 0 }}>{c.name}</p>
+              <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", margin: 0, textTransform: "lowercase" }}>{c.role}</p>
+            </button>
+          ))}
+          <button
+            className="btn btn--secondary"
+            onClick={() => setShowCreate(true)}
+            style={{ alignSelf: "flex-start", marginTop: "0.5rem" }}
+          >
+            + New Co-op
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Handbook view
+  const activeCoop = coops.find((c) => c.id === coopId);
   const section = HANDBOOK.find((s) => s.id === activeSection) ?? HANDBOOK[0];
   const completedInSection = section.fields.filter((f) => entries[f.id]?.trim()).length;
-
-  if (status === "loading" || loading) return <p className="text-muted">Loading your handbook…</p>;
 
   return (
     <div style={{ display: "flex", gap: "2rem", alignItems: "flex-start" }}>
 
       {/* Sidebar */}
-      <aside style={{
-        width: "220px",
-        flexShrink: 0,
-        position: "sticky",
-        top: "80px",
-      }}>
+      <aside style={{ width: "220px", flexShrink: 0, position: "sticky", top: "80px" }}>
+        <div style={{ marginBottom: "1.25rem", paddingBottom: "1rem", borderBottom: "1px solid var(--color-border)" }}>
+          <p style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: "0.25rem" }}>
+            Co-op
+          </p>
+          <p style={{ fontWeight: 600, fontSize: "0.85rem", margin: "0 0 0.25rem", color: "var(--color-limestone)" }}>
+            {activeCoop?.name}
+          </p>
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            {coops.length > 1 && (
+              <button
+                onClick={() => setCoopId(null)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", fontSize: "0.75rem", padding: 0, fontFamily: "var(--font-sans)" }}
+              >
+                Switch
+              </button>
+            )}
+            <button
+              onClick={() => setShowCreate(true)}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", fontSize: "0.75rem", padding: 0, fontFamily: "var(--font-sans)" }}
+            >
+              + New
+            </button>
+          </div>
+        </div>
+
         <p style={{ fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-text-muted)", marginBottom: "0.75rem" }}>
           Sections
         </p>

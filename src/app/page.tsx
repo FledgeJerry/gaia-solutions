@@ -1,6 +1,11 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const handbookHref = session ? "/handbook" : "/register";
+  const handbookLabel = session ? "My Handbook" : "Start Your Handbook";
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
 
@@ -14,11 +19,11 @@ export default function Home() {
           A guided platform for founding groups ready to build a worker-owned cooperative — from first idea to full business plan.
         </p>
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="/register" className="btn btn--primary">Start Your Handbook</Link>
+          <Link href={handbookHref} className="btn btn--primary">{handbookLabel}</Link>
           <Link href="/about" className="btn btn--secondary">Learn More</Link>
         </div>
         <p style={{ marginTop: "1.5rem", fontSize: "0.875rem", color: "var(--color-text-muted)", fontStyle: "italic" }}>
-          "The most radical thing we can do is build something we actually own."
+          &ldquo;The most radical thing we can do is build something we actually own.&rdquo;
         </p>
       </section>
 
@@ -87,6 +92,7 @@ export default function Home() {
             { title: "Democratic Governance", desc: "One worker, one vote. Not one dollar, one vote." },
             { title: "Transparency", desc: "Open books. Honest numbers. Real conversations. Secrets are how power concentrates." },
             { title: "Community Benefit", desc: "Local suppliers. Local jobs. Local investment. Keep the value in the neighborhood." },
+            { title: "Co-ops Buy From Co-ops", desc: "When we choose our suppliers, vendors, and service providers, we look inside the network first. Keeping value circulating within the co-op ecosystem is how we grow together." },
           ].map(({ title, desc }) => (
             <div key={title} className="card--raised" style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
               <strong style={{ whiteSpace: "nowrap", minWidth: "160px" }}>{title}</strong>
@@ -102,7 +108,7 @@ export default function Home() {
         <p style={{ marginBottom: "2rem", maxWidth: "480px", margin: "0 auto 2rem" }}>
           Create a free account to start your co-op handbook. Save your answers, collaborate with your founding group, and generate your full business plan.
         </p>
-        <Link href="/register" className="btn btn--primary">Start Your Handbook</Link>
+        <Link href={handbookHref} className="btn btn--primary">{handbookLabel}</Link>
       </section>
 
     </div>

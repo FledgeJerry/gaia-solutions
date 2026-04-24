@@ -11,6 +11,11 @@ enum Role {
   ADMIN
 }
 
+enum CoopRole {
+  OWNER
+  EDITOR
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -39,7 +44,29 @@ model User {
 
   accounts        Account[]
   sessions        Session[]
+  coopMemberships CoopMember[]
+}
+
+model Coop {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members         CoopMember[]
   handbookEntries HandbookEntry[]
+}
+
+model CoopMember {
+  id     String   @id @default(cuid())
+  coopId String
+  userId String
+  role   CoopRole @default(EDITOR)
+
+  coop Coop @relation(fields: [coopId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([coopId, userId])
 }
 
 model Account {
@@ -79,12 +106,12 @@ model VerificationToken {
 
 model HandbookEntry {
   id        String   @id @default(cuid())
-  userId    String
+  coopId    String
   fieldId   String
   value     String
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coop Coop @relation(fields: [coopId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, fieldId])
+  @@unique([coopId, fieldId])
 }

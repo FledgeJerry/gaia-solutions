@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 type User = {
   id: string;
@@ -11,6 +10,7 @@ type User = {
   email: string;
   role: "USER" | "ADMIN";
   createdAt: string;
+  _count: { coopMemberships: number };
 };
 
 export default function AdminPage() {
@@ -53,7 +53,7 @@ export default function AdminPage() {
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Handbook</th>
+              <th>Co-ops</th>
               <th>Joined</th>
             </tr>
           </thead>
@@ -73,14 +73,7 @@ export default function AdminPage() {
                     <option value="ADMIN">Admin</option>
                   </select>
                 </td>
-                <td>
-                  <Link
-                    href={`/admin/handbook/${u.id}`}
-                    style={{ fontSize: "0.85rem", color: "var(--color-dome-gold)" }}
-                  >
-                    View
-                  </Link>
-                </td>
+                <td>{u._count.coopMemberships}</td>
                 <td style={{ fontSize: "0.8rem" }}>{new Date(u.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}

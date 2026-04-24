@@ -2,13 +2,26 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+async function getMembership(userId: string, coopId: string) {
+  return prisma.coopMember.findUnique({
+    where: { coopId_userId: { coopId, userId } },
+  });
+}
+
+export async function GET(req: Request) {
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const { searchParams } = new URL(req.url);
+    const coopId = searchParams.get("coopId");
+    if (!coopId) return NextResponse.json({ error: "coopId required" }, { status: 400 });
+
+    const membership = await getMembership(session.user.id, coopId);
+    if (!membership) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
     const entries = await prisma.handbookEntry.findMany({
-      where: { userId: session.user.id },
+      where: { coopId },
       select: { fieldId: true, value: true, updatedAt: true },
     });
 
@@ -23,13 +36,16 @@ export async function PATCH(req: Request) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { fieldId, value } = await req.json();
-  if (!fieldId) return NextResponse.json({ error: "fieldId required" }, { status: 400 });
+  const { coopId, fieldId, value } = await req.json();
+  if (!coopId || !fieldId) return NextResponse.json({ error: "coopId and fieldId required" }, { status: 400 });
+
+  const membership = await getMembership(session.user.id, coopId);
+  if (!membership) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const entry = await prisma.handbookEntry.upsert({
-    where: { userId_fieldId: { userId: session.user.id, fieldId } },
+    where: { coopId_fieldId: { coopId, fieldId } },
     update: { value },
-    create: { userId: session.user.id, fieldId, value },
+    create: { coopId, fieldId, value },
   });
 
   return NextResponse.json(entry);
