@@ -29,6 +29,8 @@ export default function HandbookPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState("");
+  const [inviteOfferEmail, setInviteOfferEmail] = useState<string | null>(null);
+  const [inviteSent, setInviteSent] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") { router.push("/login"); return; }
@@ -63,6 +65,8 @@ export default function HandbookPage() {
     if (!inviteEmail.trim() || !coopId) return;
     setInviting(true);
     setInviteError("");
+    setInviteOfferEmail(null);
+    setInviteSent(false);
     const res = await fetch(`/api/coops/${coopId}/members`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -70,10 +74,33 @@ export default function HandbookPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setInviteError(data.error ?? "Something went wrong");
+      if (res.status === 404) {
+        setInviteOfferEmail(inviteEmail.trim());
+      } else {
+        setInviteError(data.error ?? "Something went wrong");
+      }
     } else {
       setMembers((prev) => [...prev, data]);
       setInviteEmail("");
+    }
+    setInviting(false);
+  }
+
+  async function handleSendInvite() {
+    if (!inviteOfferEmail) return;
+    setInviting(true);
+    const res = await fetch("/api/invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: inviteOfferEmail }),
+    });
+    if (res.ok) {
+      setInviteSent(true);
+      setInviteOfferEmail(null);
+      setInviteEmail("");
+    } else {
+      setInviteError("Failed to send invite");
+      setInviteOfferEmail(null);
     }
     setInviting(false);
   }
@@ -268,7 +295,7 @@ export default function HandbookPage() {
                   <input
                     type="email"
                     value={inviteEmail}
-                    onChange={(e) => { setInviteEmail(e.target.value); setInviteError(""); }}
+                    onChange={(e) => { setInviteEmail(e.target.value); setInviteError(""); setInviteOfferEmail(null); setInviteSent(false); }}
                     placeholder="Email address"
                     style={{ flex: 1, fontSize: "0.75rem", padding: "0.3rem 0.5rem" }}
                   />
@@ -278,6 +305,22 @@ export default function HandbookPage() {
                 </form>
               )}
               {inviteError && <p style={{ fontSize: "0.72rem", color: "#e07070", margin: 0 }}>{inviteError}</p>}
+              {inviteSent && <p style={{ fontSize: "0.72rem", color: "var(--color-teal-accent)", margin: 0 }}>Invite sent!</p>}
+              {inviteOfferEmail && (
+                <div style={{ background: "rgba(232,200,74,0.08)", border: "1px solid rgba(232,200,74,0.3)", borderRadius: "6px", padding: "0.6rem 0.75rem", marginTop: "0.25rem" }}>
+                  <p style={{ fontSize: "0.72rem", color: "var(--color-limestone)", margin: "0 0 0.4rem", lineHeight: 1.4 }}>
+                    No account for <strong>{inviteOfferEmail}</strong>. Send them an invite?
+                  </p>
+                  <div style={{ display: "flex", gap: "0.4rem" }}>
+                    <button onClick={handleSendInvite} disabled={inviting} className="btn btn--primary btn--sm" style={{ fontSize: "0.7rem", padding: "0.25rem 0.6rem" }}>
+                      {inviting ? "Sending…" : "Send invite"}
+                    </button>
+                    <button onClick={() => { setInviteOfferEmail(null); setInviteEmail(""); }} className="btn btn--ghost btn--sm" style={{ fontSize: "0.7rem", padding: "0.25rem 0.6rem" }}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
