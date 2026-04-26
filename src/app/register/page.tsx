@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefillEmail = searchParams.get("email") ?? "";
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
@@ -45,7 +48,7 @@ export default function RegisterPage() {
         </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+          <input id="email" name="email" type="email" required placeholder="you@example.com" defaultValue={prefillEmail} />
         </div>
         <div className="form-group">
           <label htmlFor="password">Password</label>
@@ -84,4 +87,8 @@ export default function RegisterPage() {
       </p>
     </div>
   );
+}
+
+export default function RegisterPage() {
+  return <Suspense fallback={null}><RegisterForm /></Suspense>;
 }

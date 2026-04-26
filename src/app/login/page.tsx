@@ -5,30 +5,50 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+type LoginState = "idle" | "loading" | "wrong_password" | "no_account" | "invite_loading" | "invite_sent";
+
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [state, setState] = useState<LoginState>("idle");
+  const [email, setEmail] = useState("");
   const [showPw, setShowPw] = useState(false);
 
   async function handleSubmit(e: { preventDefault(): void; currentTarget: HTMLFormElement }) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setState("loading");
     const fd = new FormData(e.currentTarget);
+    const submittedEmail = (fd.get("email") as string).toLowerCase().trim();
+    setEmail(submittedEmail);
+
     const result = await signIn("credentials", {
-      email: fd.get("email"),
+      email: submittedEmail,
       password: fd.get("password"),
       redirect: false,
     });
-    setLoading(false);
-    if (result?.error) {
-      setError("Invalid email or password");
-    } else {
+
+    if (!result?.error) {
       router.push("/handbook");
       router.refresh();
+      return;
     }
+
+    // Distinguish "no account" from "wrong password"
+    const check = await fetch(`/api/invite?email=${encodeURIComponent(submittedEmail)}`);
+    const { exists } = await check.json();
+    setState(exists ? "wrong_password" : "no_account");
   }
+
+  async function sendInvite() {
+    setState("invite_loading");
+    const res = await fetch("/api/invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    setState(res.ok ? "invite_sent" : "wrong_password");
+  }
+
+  const isLoading = state === "loading" || state === "invite_loading";
 
   return (
     <div style={{ maxWidth: "420px", margin: "3rem auto" }}>
@@ -38,7 +58,15 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="card">
         <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder="you@example.com"
+            defaultValue={email}
+            onChange={() => setState("idle")}
+          />
         </div>
         <div className="form-group">
           <label htmlFor="password">Password</label>
@@ -49,6 +77,7 @@ export default function LoginPage() {
               type={showPw ? "text" : "password"}
               required
               style={{ paddingRight: "3rem" }}
+              onChange={() => setState("idle")}
             />
             <button
               type="button"
@@ -63,11 +92,43 @@ export default function LoginPage() {
             </button>
           </div>
         </div>
-        {error && <div className="alert alert--error">{error}</div>}
-        <button type="submit" disabled={loading} className="btn btn--primary" style={{ width: "100%", justifyContent: "center" }}>
-          {loading ? "Signing in…" : "Sign in"}
+
+        {state === "wrong_password" && (
+          <div className="alert alert--error">Incorrect password.</div>
+        )}
+
+        <button type="submit" disabled={isLoading} className="btn btn--primary" style={{ width: "100%", justifyContent: "center" }}>
+          {state === "loading" ? "Signing in…" : "Sign in"}
         </button>
       </form>
+
+      {/* No account found — invite offer */}
+      {(state === "no_account" || state === "invite_loading" || state === "invite_sent") && (
+        <div className="card" style={{ marginTop: "1rem", borderColor: "var(--color-dome-gold)" }}>
+          {state === "invite_sent" ? (
+            <>
+              <p style={{ fontWeight: 600, color: "var(--color-dome-gold)", margin: "0 0 0.25rem" }}>Invite sent!</p>
+              <p style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)", margin: 0 }}>
+                Check your inbox at <strong>{email}</strong> for a link to create your account.
+              </p>
+            </>
+          ) : (
+            <>
+              <p style={{ fontWeight: 600, margin: "0 0 0.25rem" }}>No account found for <span style={{ color: "var(--color-dome-gold)" }}>{email}</span></p>
+              <p style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)", margin: "0 0 1rem" }}>
+                Want us to send you an invite link to get started?
+              </p>
+              <button
+                onClick={sendInvite}
+                disabled={state === "invite_loading"}
+                className="btn btn--primary btn--sm"
+              >
+                {state === "invite_loading" ? "Sending…" : "Send me an invite →"}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       <p style={{ textAlign: "center", marginTop: "1.25rem", fontSize: "0.9rem", color: "var(--color-text-muted)" }}>
         No account?{" "}
