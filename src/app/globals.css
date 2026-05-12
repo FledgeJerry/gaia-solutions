@@ -1,26 +1,347 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
+/* ============================================================
+   COLOR TOKENS  — moss greens + amber/gold + earth darks
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Greens */
+  --moss:         #2D4A2D;
+  --fern:         #3D6B3D;
+  --sage:         #6B8F5E;
+  --lichen:       #A8C49A;
+  --spore:        #D4E8CA;
+  --mycel:        #F0F7EC;
+
+  /* Neutrals */
+  --paper:        #F6F4EE;
+  --warm:         #FDFCF8;
+  --rule:         #DDD9CE;
+  --rule-heavy:   #C4C0B4;
+
+  /* Amber */
+  --amber:        #C9921A;
+  --amber-dim:    #8A6010;
+  --amber-light:  #F0C040;
+  --amber-bg:     #FEF6E7;
+  --amber-pale:   #FDF3DC;
+
+  /* Earth */
+  --soil:         #2A1E0E;
+  --bark:         #5C4A2A;
+  --clay:         #9E7C50;
+
+  /* Dark green surfaces */
+  --field:        #1A2A1A;
+  --field-mid:    #243024;
+  --field-border: #2A3A2A;
+  --field-rule:   #222E22;
+
+  /* CRM status */
+  --status-hot:   var(--amber);
+  --status-warm:  var(--amber-dim);
+  --status-cool:  var(--lichen);
+  --status-cold:  var(--rule-heavy);
+  --status-done:  var(--fern);
+  --status-block: #7A3A1A;
+  --status-flag:  var(--amber);
+
+  /* Contact accents */
+  --blue:         #1A4D8C;
+  --blue-bg:      #E8EFF9;
+  --blue-text:    #1A3D6B;
+  --purple:       #4A2D8C;
+  --purple-bg:    #F0EDFB;
+  --purple-text:  #3A1D7C;
+
+  /* Typography */
+  --font-display: 'Archivo Black', sans-serif;
+  --font-sans:    'Archivo', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  /* ---- Backwards-compat aliases (used in inline styles) ---- */
+  --ink:          var(--soil);
+  --warm-white:   var(--warm);
+  --fog:          var(--mycel);
+  --gold:         var(--amber);
+  --gold-light:   var(--amber-light);
+  --gold-bg:      var(--amber-bg);
+  --gold-text:    var(--amber-dim);
+  --red:          var(--status-block);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-sans); background: var(--paper); color: var(--soil); line-height: 1.55; overflow-x: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.t-display-hero { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 5.5rem); line-height: 0.95; letter-spacing: -0.01em; color: var(--mycel); }
+.t-display-xl   { font-family: var(--font-display); font-size: clamp(3.2rem, 6.5vw, 5.8rem); line-height: 0.95; letter-spacing: -0.01em; }
+.t-display-lg   { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.0; color: var(--spore); }
+.t-display-md   { font-family: var(--font-display); font-size: 1.9rem; line-height: 1.05; letter-spacing: 0.02em; color: var(--moss); }
+.t-display-sm   { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.1; color: var(--moss); }
+.t-body-lg  { font-size: 1rem;    font-weight: 300; line-height: 1.8;  color: var(--bark); }
+.t-body     { font-size: 0.88rem; font-weight: 300; line-height: 1.7;  color: var(--bark); }
+.t-body-sm  { font-size: 0.82rem; font-weight: 300; line-height: 1.65; color: var(--bark); }
+.t-body-xs  { font-size: 0.78rem; font-weight: 300; line-height: 1.6;  color: var(--clay); }
+.t-deck { font-size: 1rem; font-weight: 300; font-style: italic; color: var(--sage); line-height: 1.8; border-left: 2px solid var(--amber); padding-left: 1.25rem; }
+.t-label { font-family: var(--font-mono); font-size: 0.60rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lichen); }
+.t-mono-lg { font-family: var(--font-mono); font-size: 0.85rem; }
+.t-mono    { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; }
+.t-mono-sm { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.10em; }
+.t-mono-xs { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.grid-hairline { display: grid; gap: 1px; background: var(--rule); }
+.grid-hairline > * { background: var(--warm); }
+.grid-hairline-dark { display: grid; gap: 1px; background: var(--field-rule); }
+.grid-hairline-dark > * { background: var(--field-mid); }
+.page-pad    { padding-left: 2.5rem; padding-right: 2.5rem; }
+.section-pad { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 2rem; background: var(--field); position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 500; color: var(--mycel); text-decoration: none; letter-spacing: 0.02em; }
+.nav-logo em { font-style: normal; color: var(--amber-light); }
+.nav-links { display: flex; gap: 1.75rem; list-style: none; align-items: center; }
+.nav-links a { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.10em; text-transform: uppercase; color: var(--sage); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover { color: var(--mycel); }
+.nav-cta { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.10em; text-transform: uppercase; background: var(--amber); color: var(--soil); font-weight: 500; padding: 0.45rem 1.1rem; text-decoration: none; }
+.nav-cta:hover { background: var(--amber-light); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn { display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.10em; text-transform: uppercase; text-decoration: none; padding: 0.75rem 1.5rem; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-solid  { background: var(--moss);  color: var(--mycel); font-weight: 500; }
+.btn-solid:hover  { background: var(--fern); }
+.btn-ghost  { background: transparent; border: 1px solid var(--rule-heavy); color: var(--bark); }
+.btn-ghost:hover  { border-color: var(--moss); color: var(--moss); }
+.btn-ghost-light { background: transparent; border: 1px solid var(--field-border); color: var(--lichen); }
+.btn-ghost-light:hover { border-color: var(--sage); color: var(--mycel); }
+.btn-amber  { background: var(--amber); color: var(--soil); font-weight: 500; }
+.btn-amber:hover  { background: var(--amber-light); }
+.btn-signal { background: var(--amber); color: var(--soil); }
+.btn-signal:hover { background: var(--amber-light); }
+
+/* ============================================================
+   PILLS / TAGS / CHIPS
+   ============================================================ */
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.15rem 0.45rem; border-radius: 2px; white-space: nowrap; }
+.pill-amber  { background: var(--amber-bg);  color: var(--amber-dim); }
+.pill-green  { background: var(--spore);     color: var(--fern); }
+.pill-blue   { background: var(--blue-bg);   color: var(--blue-text); }
+.pill-purple { background: var(--purple-bg); color: var(--purple-text); }
+.pill-gray   { background: #ECEAE4;          color: var(--bark); }
+.pill-gold   { background: var(--amber-bg);  color: var(--amber-dim); }
+.pill-red    { background: #F5EBE0;          color: #7A3A1A; }
+.pill-blocked{ background: #F5EBE0;          color: #7A3A1A; }
+.chip { display: inline-block; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.07em; text-transform: uppercase; background: var(--spore); color: var(--fern); padding: 0.2rem 0.5rem; margin-right: 0.3rem; margin-bottom: 0.3rem; }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.10em; text-transform: uppercase; border: 1px solid var(--field-border); color: var(--sage); padding: 0.25rem 0.6rem; background: transparent; }
+.tag-active { border-color: var(--amber-dim); color: var(--amber); }
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+.section-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.section-num   { font-family: var(--font-mono); font-size: 0.60rem; letter-spacing: 0.10em; color: var(--lichen); flex-shrink: 0; }
+.section-title { font-family: var(--font-display); font-size: 1.9rem; color: var(--moss); letter-spacing: 0.02em; }
+.section-dek   { font-size: 0.85rem; font-weight: 300; font-style: italic; color: var(--sage); margin-left: auto; max-width: 300px; line-height: 1.65; text-align: right; }
+
+/* ============================================================
+   MANIFESTO BAND
+   ============================================================ */
+.manifesto-band { background: var(--moss); padding: 2rem 2.5rem; display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; }
+.manifesto-headline { font-family: var(--font-display); font-size: clamp(1.4rem, 2.8vw, 2.2rem); color: var(--mycel); line-height: 1.1; flex: 1; min-width: 260px; }
+.manifesto-sub { font-size: 0.88rem; font-weight: 300; font-style: italic; color: var(--lichen); max-width: 360px; line-height: 1.65; }
+
+/* ============================================================
+   STAT STRIP
+   ============================================================ */
+.stat-strip { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--rule); }
+.stat-cell { padding: 1.5rem 1.75rem; border-right: 1px solid var(--rule); }
+.stat-cell:last-child { border-right: none; }
+.stat-number { font-family: var(--font-display); font-size: 2rem; color: var(--moss); display: block; margin-bottom: 0.2rem; }
+.stat-label  { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.10em; text-transform: uppercase; color: var(--sage); }
+
+/* ============================================================
+   WORK CARDS
+   ============================================================ */
+.work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.work-card { background: var(--warm); padding: 1.75rem; transition: background 0.15s; }
+.work-card:hover { background: var(--mycel); }
+.work-card-featured { grid-column: span 2; background: var(--field-mid); }
+.work-card-featured:hover { background: var(--field); }
+.work-card-category { font-family: var(--font-mono); font-size: 0.60rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lichen); margin-bottom: 0.6rem; }
+.work-card-featured .work-card-category { color: var(--amber); }
+.work-card-title { font-family: var(--font-display); font-size: 1.2rem; color: var(--moss); margin-bottom: 0.5rem; line-height: 1.1; }
+.work-card-featured .work-card-title { font-size: 1.55rem; color: var(--spore); }
+.work-card-body { font-size: 0.80rem; font-weight: 300; color: var(--bark); line-height: 1.65; margin-bottom: 0.9rem; }
+.work-card-featured .work-card-body { color: var(--sage); }
+.work-card-url { font-family: var(--font-mono); font-size: 0.60rem; color: var(--lichen); text-decoration: none; }
+.work-card-url:hover { color: var(--amber); }
+
+/* ============================================================
+   CAPABILITY CARDS
+   ============================================================ */
+.cap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.cap-card { background: var(--warm); padding: 2rem 1.75rem; }
+.cap-number { font-family: var(--font-mono); font-size: 0.60rem; letter-spacing: 0.10em; color: var(--amber); margin-bottom: 0.5rem; }
+.cap-title  { font-family: var(--font-display); font-size: 1.15rem; color: var(--moss); margin-bottom: 0.6rem; }
+.cap-body   { font-size: 0.85rem; font-weight: 300; color: var(--bark); line-height: 1.7; margin-bottom: 0.75rem; }
+
+/* ============================================================
+   TEAM
+   ============================================================ */
+.team-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--rule); }
+.team-card { background: var(--warm); padding: 2.25rem 2rem; }
+.team-role-tag { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.75rem; }
+.team-name { font-family: var(--font-display); font-size: 1.6rem; color: var(--moss); margin-bottom: 1.25rem; line-height: 1; }
+.team-list { list-style: none; margin-bottom: 1.25rem; }
+.team-list li { font-size: 0.82rem; font-weight: 300; color: var(--bark); padding: 0.4rem 0; border-bottom: 1px solid var(--rule); display: flex; gap: 0.6rem; align-items: baseline; }
+.team-list li::before { content: "→"; color: var(--amber); flex-shrink: 0; font-size: 0.75rem; }
+.team-bio { font-size: 0.85rem; font-weight: 300; font-style: italic; color: var(--clay); line-height: 1.7; }
+.open-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 260px; border: 1.5px dashed var(--rule-heavy); padding: 2rem; margin: 1.75rem; }
+.open-slot-head { font-family: var(--font-display); font-size: 1.1rem; color: var(--lichen); margin-bottom: 0.75rem; }
+.open-slot-body { font-size: 0.82rem; font-weight: 300; color: var(--sage); line-height: 1.65; margin-bottom: 1.25rem; }
+.open-slot-link { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.10em; text-transform: uppercase; color: var(--amber); text-decoration: none; }
+.team-open-slot { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 280px; border: 1.5px dashed var(--rule-heavy); padding: 2rem; }
+
+/* ============================================================
+   APPROACH
+   ============================================================ */
+.approach-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
+.approach-cell { background: var(--warm); padding: 1.75rem; }
+.approach-num  { font-family: var(--font-mono); font-size: 0.60rem; letter-spacing: 0.10em; color: var(--lichen); margin-bottom: 0.4rem; }
+.approach-title { font-size: 0.9rem; font-weight: 500; color: var(--moss); margin-bottom: 0.4rem; }
+.approach-body  { font-size: 0.82rem; font-weight: 300; color: var(--bark); line-height: 1.65; }
+.approach-body strong { font-weight: 500; color: var(--moss); }
+
+/* ============================================================
+   WHO WE ARE
+   ============================================================ */
+.who-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); }
+.who-card { background: var(--warm); padding: 2rem 1.75rem; }
+.who-card-dark { background: var(--field); }
+.who-icon { font-family: var(--font-display); font-size: 2rem; color: var(--amber); margin-bottom: 0.75rem; line-height: 1; }
+.who-card-dark .who-icon { color: var(--amber-light); }
+.who-title { font-family: var(--font-display); font-size: 1.05rem; color: var(--moss); margin-bottom: 0.5rem; }
+.who-card-dark .who-title { color: var(--mycel); }
+.who-body { font-size: 0.85rem; font-weight: 300; color: var(--bark); line-height: 1.7; }
+.who-card-dark .who-body { color: var(--sage); }
+
+/* ============================================================
+   CTA BAND
+   ============================================================ */
+.cta-band { background: var(--soil); padding: 4rem 2.5rem; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 3rem; }
+.cta-band h2 { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); color: var(--spore); line-height: 1.05; margin-bottom: 0.75rem; }
+.cta-band p { font-size: 0.9rem; font-weight: 300; font-style: italic; color: var(--clay); max-width: 420px; line-height: 1.7; }
+.cta-actions { display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-end; flex-shrink: 0; }
+
+/* ============================================================
+   CRM
+   ============================================================ */
+.contact-list { display: flex; flex-direction: column; gap: 1px; background: var(--rule); }
+.contact-row { background: var(--warm); padding: 0.75rem 1rem; display: grid; grid-template-columns: 32px 1fr 120px 100px 80px; align-items: center; gap: 0.75rem; cursor: pointer; transition: background 0.1s; }
+.contact-row:hover { background: var(--mycel); }
+.contact-row-header { background: #E8EDE4; cursor: default; }
+.contact-row-header:hover { background: #E8EDE4; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500; flex-shrink: 0; }
+.av-amber  { background: var(--amber-bg);  color: var(--amber-dim); }
+.av-green  { background: var(--spore);     color: var(--fern); }
+.av-blue   { background: var(--blue-bg);   color: var(--blue-text); }
+.av-purple { background: var(--purple-bg); color: var(--purple-text); }
+.av-sage   { background: #E8EDE4;          color: var(--moss); }
+.warmth-bar  { height: 4px; border-radius: 2px; background: var(--rule); }
+.warmth-fill { height: 4px; border-radius: 2px; }
+.warmth-hot  { background: var(--amber); }
+.warmth-warm { background: var(--amber-dim); }
+.warmth-cool { background: var(--lichen); }
+.warmth-cold { background: var(--rule-heavy); }
+.context-note { padding: 0.6rem 0.75rem; background: var(--amber-pale); border-left: 3px solid var(--amber); font-size: 0.78rem; font-weight: 300; color: var(--bark); line-height: 1.6; }
+.context-note strong { font-weight: 500; color: var(--soil); }
+
+/* ============================================================
+   PROJECT BOARD
+   ============================================================ */
+.board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.board-col-header { background: #E8EDE4; padding: 0.6rem 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+.board-col-title  { font-family: var(--font-mono); font-size: 0.60rem; letter-spacing: 0.10em; text-transform: uppercase; color: var(--moss); }
+.wip-badge { font-family: var(--font-mono); font-size: 0.58rem; background: var(--warm); color: var(--sage); padding: 0.1rem 0.35rem; border-radius: 2px; }
+.wip-badge-hot { background: var(--amber-bg); color: var(--amber-dim); }
+.board-col-body { background: var(--paper); padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; min-height: 320px; }
+.story-card { background: var(--warm); border: 1px solid var(--rule); border-radius: 3px; padding: 0.6rem 0.7rem; cursor: pointer; transition: border-color 0.15s; }
+.story-card:hover { border-color: var(--rule-heavy); }
+.story-card-blocked { border-left: 3px solid var(--status-block); border-radius: 0; }
+.story-card-done { opacity: 0.55; }
+.story-points { font-family: var(--font-mono); font-size: 0.60rem; background: var(--spore); color: var(--fern); padding: 0.1rem 0.35rem; border-radius: 2px; }
+.sprint-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: var(--field); margin-bottom: 1rem; border-radius: 3px; }
+.sprint-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; color: var(--sage); }
+.sprint-label span { color: var(--amber); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer { background: var(--field); border-top: 1px solid var(--field-border); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; }
+.footer-col { padding: 2rem; border-right: 1px solid var(--field-rule); }
+.footer-col:last-child { border-right: none; }
+.footer-brand-name { font-family: var(--font-mono); font-size: 0.85rem; color: var(--mycel); margin-bottom: 0.5rem; }
+.footer-brand-name em { font-style: normal; color: var(--amber-light); }
+.footer-tagline { font-size: 0.80rem; font-weight: 300; color: #4A6A4A; line-height: 1.6; max-width: 200px; margin-bottom: 0.75rem; }
+.footer-col h5 { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: #3A5A3A; margin-bottom: 0.75rem; }
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 0.35rem; }
+.footer-col ul li a { font-size: 0.80rem; color: #4A6A4A; text-decoration: none; transition: color 0.15s; }
+.footer-col ul li a:hover { color: var(--lichen); }
+.footer-bottom { background: var(--field); border-top: 1px solid #1E2A1E; padding: 0.85rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+.footer-bottom p { font-family: var(--font-mono); font-size: 0.58rem; color: #3A4A3A; letter-spacing: 0.06em; }
+.footer-mark { font-family: var(--font-mono); font-size: 0.58rem; color: var(--amber); letter-spacing: 0.06em; }
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.text-moss   { color: var(--moss); }   .text-amber  { color: var(--amber); }
+.text-sage   { color: var(--sage); }   .text-lichen { color: var(--lichen); }
+.text-bark   { color: var(--bark); }   .text-clay   { color: var(--clay); }
+.text-mycel  { color: var(--mycel); }  .text-spore  { color: var(--spore); }
+.text-red    { color: var(--status-block); }
+.text-gold   { color: var(--amber); }
+.text-muted  { color: var(--sage); }
+.bg-field    { background: var(--field); }   .bg-moss   { background: var(--moss); }
+.bg-paper    { background: var(--paper); }   .bg-warm   { background: var(--warm); }
+.bg-mycel    { background: var(--mycel); }   .bg-soil   { background: var(--soil); }
+.border-left-amber { border-left: 3px solid var(--amber); }
+.border-left-moss  { border-left: 3px solid var(--moss); }
+.border-top-rule   { border-top: 1px solid var(--rule); }
+.border-bot-rule   { border-bottom: 1px solid var(--rule); }
+
+.pulse-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); display: inline-block; animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+.quick-add-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; background: #E8EDE4; cursor: pointer; font-size: 0.80rem; color: var(--sage); transition: background 0.15s; border-radius: 3px; }
+.quick-add-bar:hover { background: var(--spore); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .stat-strip { grid-template-columns: repeat(2, 1fr); }
+  .work-grid, .cap-grid, .team-grid, .who-grid, .approach-grid { grid-template-columns: 1fr; }
+  .work-card-featured { grid-column: span 1; }
+  .footer { grid-template-columns: 1fr 1fr; }
+  .page-pad { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .section-dek { margin-left: 0; text-align: left; }
+  .cta-band { grid-template-columns: 1fr; }
+  .cta-actions { align-items: flex-start; }
 }
