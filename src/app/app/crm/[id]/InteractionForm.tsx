@@ -16,7 +16,7 @@ export default function InteractionForm({ contactId }: { contactId: string }) {
   const [saving, setSaving] = useState(false);
 
   const mono: React.CSSProperties = { fontFamily: "var(--font-mono)" };
-  const field: React.CSSProperties = { ...mono, fontSize: "0.75rem", padding: "0.45rem 0.6rem", background: "var(--field)", border: "1px solid var(--field-border)", borderRadius: "2px", color: "var(--ink)", outline: "none", width: "100%", boxSizing: "border-box" };
+  const field: React.CSSProperties = { ...mono, fontSize: "0.75rem", padding: "0.45rem 0.6rem", background: "var(--paper)", border: "1px solid var(--rule)", borderRadius: "2px", color: "var(--soil)", outline: "none", width: "100%", boxSizing: "border-box" };
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

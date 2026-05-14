@@ -9,6 +9,17 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  MEMBER
+  CLIENT
+}
+
+enum TimeCategory {
+  DEVELOPMENT
+  DESIGN
+  MEETING
+  OPS
+  RESEARCH
+  OTHER
 }
 
 enum OrgType {
@@ -60,13 +71,16 @@ model User {
   email         String    @unique
   emailVerified DateTime?
   passwordHash  String?
-  role          Role      @default(USER)
+  role          Role      @default(MEMBER)
+  contactId     String?   @unique
   createdAt     DateTime  @default(now())
 
   accounts      Account[]
   sessions      Session[]
   interactions  Interaction[]
   stories       Story[]
+  timeEntries   TimeEntry[]
+  contact       Contact?  @relation(fields: [contactId], references: [id])
 }
 
 model Account {
@@ -112,9 +126,10 @@ model Org {
   website   String?
   createdAt DateTime @default(now())
 
-  contacts  Contact[]
-  stories   Story[]
-  proposals Proposal[]
+  contacts    Contact[]
+  stories     Story[]
+  proposals   Proposal[]
+  timeEntries TimeEntry[]
 }
 
 model Contact {
@@ -136,6 +151,21 @@ model Contact {
   interactions Interaction[]
   stories      Story[]
   proposals    Proposal[]
+  user         User?
+}
+
+model TimeEntry {
+  id        String       @id @default(cuid())
+  userId    String
+  date      DateTime     @db.Date
+  hours     Float
+  category  TimeCategory @default(DEVELOPMENT)
+  notes     String?
+  orgId     String?
+  createdAt DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Org? @relation(fields: [orgId], references: [id])
 }
 
 model Interaction {
