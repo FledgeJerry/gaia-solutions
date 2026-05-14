@@ -56,7 +56,7 @@ export default function EditContactForm({ contact }: { contact: Contact }) {
   }
 
   const mono: React.CSSProperties = { fontFamily: "var(--font-mono)" };
-  const field: React.CSSProperties = { ...mono, fontSize: "0.75rem", padding: "0.45rem 0.6rem", background: "var(--field)", border: "1px solid var(--field-border)", borderRadius: "2px", color: "var(--ink)", outline: "none", width: "100%", boxSizing: "border-box" };
+  const field: React.CSSProperties = { ...mono, fontSize: "0.75rem", padding: "0.45rem 0.6rem", background: "var(--paper)", border: "1px solid var(--rule)", borderRadius: "2px", color: "var(--soil)", outline: "none", width: "100%", boxSizing: "border-box" };
   const lbl: React.CSSProperties = { ...mono, fontSize: "0.56rem", letterSpacing: "0.10em", textTransform: "uppercase" as const, color: "#888", display: "block", marginBottom: "0.25rem" };
 
   return (
