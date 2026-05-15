@@ -199,6 +199,7 @@ model Story {
   points      Int         @default(1)
   status      StoryStatus @default(BACKLOG)
   type        StoryType   @default(INTERNAL)
+  notes       String?
   blocked     Boolean     @default(false)
   flagged     Boolean     @default(false)
   sprintId    String?
