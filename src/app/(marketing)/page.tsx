@@ -14,14 +14,14 @@ const work = [
 
 const capabilities = [
   { num: "01", title: "Civic & Investigative Tech", body: "OSINT tooling, investigative data platforms, public records pipelines, surveillance mapping, and narrative visualization. We build for journalists, advocates, and communities who need rigorous tools that can withstand scrutiny.", chips: ["OSINT", "Data viz", "Public records", "Mapping", "Investigative"] },
-  { num: "02", title: "Management Systems & Auditing", body: "ISO 9001, ISO 22000, FSSC 22000, and automotive/aerospace quality systems. Internal audit programs, gap analysis, corrective action systems, and compliance software. Auditor's rigor applied to the full stack.", chips: ["ISO 9001", "Food safety", "Automotive", "Gap analysis", "Compliance"] },
+  { num: "02", title: "Websites & CRM for Entrepreneurs, Nonprofits & Artists", body: "Functional websites built around how you actually work — with contact management, booking, client tracking, donor management, and email marketing built in from day one. For entrepreneurs launching, nonprofits growing, and artists owning their practice. No agency markup. No dependency trap.", chips: ["CRM", "Booking systems", "Donor management", "Email marketing", "Artist portfolios", "E-commerce"] },
   { num: "03", title: "Data Platforms & Public Diagnostics", body: "Community-scale data infrastructure. Civic prediction platforms, public health dashboards, economic diagnostics, and open data pipelines. Built to be maintained, not just launched.", chips: ["PostgreSQL", "Data pipelines", "Dashboards", "Civic platforms", "Open data"] },
   { num: "04", title: "Cooperative & Community Infrastructure", body: "Technology for the solidarity economy. Co-op formation tools, federated network infrastructure, mutual aid platforms, and community-governed digital spaces. We build with, not for.", chips: ["Co-op tech", "Federated", "Mutual aid", "Community gov", "Open source"] },
 ];
 
 const principles = [
   { num: "01", title: "Binding over voluntary", body: "We make commitments that hold. Agreements are binding, not suggestions. Accountability is structural, not interpersonal." },
-  { num: "02", title: "Auditor's rigor", body: "Every system gets the same scrutiny we'd apply in an ISO audit. Evidence-based. Traceable. No assumptions left unchecked." },
+  { num: "02", title: "Auditor's rigor", body: "Every system gets the same scrutiny you'd apply to a formal audit. Evidence-based. Traceable. No assumptions left unchecked." },
   { num: "03", title: "Open source default", body: "If it can be open, it is. We build in the open, share what we learn, and refuse to lock communities into tools they don't control." },
   { num: "04", title: "No extractive pricing", body: "Sliding scale for mutual aid and co-ops. Full rate for institutions that can afford it. We don't extract from the communities we work with." },
   { num: "05", title: "Build with, not for", body: "We don't hand off black boxes. We build internal capacity alongside the software itself. When we leave, you can maintain what we built." },
@@ -36,7 +36,7 @@ export default function HomePage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", maxWidth: "1200px", margin: "0 auto", alignItems: "start" }}>
           <div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "2rem" }}>
-              {["worker-owned", "Lansing MI", "entrepreneurs", "artists", "activists", "auditors", "investigators", "community builders"].map(tag => (
+              {["worker-owned", "Lansing MI", "entrepreneurs", "nonprofits", "artists", "activists", "investigators", "community builders"].map(tag => (
                 <span key={tag} className="pill pill-gray">{tag}</span>
               ))}
             </div>
@@ -57,7 +57,7 @@ export default function HomePage() {
               <div style={{ marginBottom: "1.5rem" }}>
                 {[
                   { label: "Structure", value: "Worker-owned LLC" },
-                  { label: "Auditing", value: "ISO 9001 · Food Safety · Automotive" },
+                  { label: "CRM", value: "Entrepreneurs · Nonprofits · Artists" },
                   { label: "Investigation", value: "OSINT · Civic tech · Public records" },
                   { label: "Tech", value: "Full-stack · Open source · Self-hosted" },
                   { label: "also", value: null },
@@ -95,7 +95,7 @@ export default function HomePage() {
       {/* STAT STRIP */}
       <div className="stat-strip">
         <div className="stat-cell"><span className="stat-number">10+</span><span className="stat-label">Years community building</span></div>
-        <div className="stat-cell"><span className="stat-number">ISO</span><span className="stat-label">Audit backbone</span></div>
+        <div className="stat-cell"><span className="stat-number">CRM</span><span className="stat-label">Built in from day one</span></div>
         <div className="stat-cell"><span className="stat-number">OS</span><span className="stat-label">Open source default</span></div>
         <div className="stat-cell"><span className="stat-number">0</span><span className="stat-label">Bullshit tolerance</span></div>
         <div className="stat-cell"><span className="stat-number">=</span><span className="stat-label">Equal stakes</span></div>
@@ -112,7 +112,7 @@ export default function HomePage() {
           {[
             { title: "Entrepreneurs & builders", body: "From first idea to co-op formation. We walk the whole path with you.", dark: false },
             { title: "Artists & community", body: "Infrastructure that centers your practice, not platforms that extract from it.", dark: false },
-            { title: "Auditors & investigators", body: "Rigorous tools built by people who understand the methodology.", dark: true },
+            { title: "Nonprofits & organizers", body: "Donor management, volunteer coordination, and community tools without the enterprise price tag.", dark: true },
             { title: "Activists & advocates", body: "Tech that doesn’t compromise your values or your security.", dark: true },
             { title: "Systems thinkers", body: "If you see the whole board, we speak your language.", dark: false },
             { title: "Local to global", body: "From Lansing city council to multi-national standards bodies. Same rigor, different scale.", dark: false },
@@ -175,8 +175,7 @@ export default function HomePage() {
             <p className="team-role-tag">Co-founder · Systems & community</p>
             <h3 className="team-name">Jerry Norris</h3>
             <ul className="team-list">
-              <li>ISO 9001 · Food Safety · Automotive quality</li>
-              <li>Community organizer · The Fledge founder</li>
+              <li>Community organizer · The Fledge founder & CEO</li>
               <li>Software dev since 1988 · U of M Statistics/CS</li>
               <li>GAIA Solutions · jadian · ePazz</li>
             </ul>

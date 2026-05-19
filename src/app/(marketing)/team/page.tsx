@@ -13,7 +13,6 @@ export default function TeamPage() {
           <p className="team-role-tag">Co-founder · Systems & community</p>
           <h3 className="team-name">Jerry Norris</h3>
           <ul className="team-list">
-            <li>ISO 9001 · Food Safety · Automotive quality systems</li>
             <li>Community organizer · The Fledge founder & CEO</li>
             <li>Software development since 1988 · U of M Statistics/CS</li>
             <li>GAIA Solutions · jadian consulting · ePazz</li>
