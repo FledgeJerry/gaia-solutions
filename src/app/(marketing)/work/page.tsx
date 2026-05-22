@@ -10,6 +10,8 @@ const work = [
   { href: "https://local-effect-snap.vercel.app/", category: "Policy", title: "SNAP Narrative Map", body: "Local economic multiplier effects of SNAP benefits, mapped by census tract." },
   { href: "https://lansing.love", category: "Civic Platform", title: "lansing.love", body: "Community civic prediction and engagement platform for Lansing, MI." },
   { href: "https://rhinocerosmedia.org", category: "Web / Co-op", title: "Rhinoceros Media", body: "Website for Rhinoceros Media — independent community journalism co-op." },
+  { href: "https://thefledge.com", category: "Web / Nonprofit", title: "The Fledge", body: "Full Next.js rebuild of a WordPress site for Lansing's makerspace and community hub. Events, booking, Stripe ticketing, AskFledge AI assistant, bounty board, and co-op incubation tools.", featured: true },
+  { href: "https://resilience.foundation", category: "Web App / Co-op", title: "Crash Out: A Resiliency Hub", body: "Co-op formation platform and entrepreneurial journey tool for ALICE households. 13-part co-op handbook, AI document generation, housing roadmap, and peer support ecosystem.", featured: true },
   { href: "https://regionpulse.com", category: "Web / Media", title: "RegionPulse", body: "Regional media and civic information platform." },
   { href: "https://clm-mvp.vercel.app/", category: "Web App", title: "CLM MVP", body: "Contract lifecycle management MVP." },
   { href: "https://launch-intel.vercel.app/", category: "Web App", title: "Idea Generator", body: "Structured ideation tool for entrepreneurs." },

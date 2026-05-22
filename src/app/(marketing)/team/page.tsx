@@ -15,10 +15,10 @@ export default function TeamPage() {
           <ul className="team-list">
             <li>Community organizer · The Fledge founder & CEO</li>
             <li>Software development since 1988 · U of M Statistics/CS</li>
-            <li>GAIA Solutions · jadian consulting · ePazz</li>
-            <li>Business Acceleration Fund Gatekeeper, LEAP (5 years)</li>
+            <li>GAIA Solutions · jadian consulting</li>
+            <li>Business Acceleration Fund Gateway Manager, LEAP (5 years)</li>
           </ul>
-          <p className="team-bio">&ldquo;If I were at a bar talking to a businessman, I&apos;d explain it one way. If it was a mathematician, I&apos;d explain it in terms of chaos theory. Same answer. Different language. Always honest.&rdquo;</p>
+          <p className="team-bio">&ldquo;Genius is lost in poverty.&rdquo;</p>
         </div>
         <div className="team-card">
           <p className="team-role-tag">Co-founder · Investigation & OSINT</p>
