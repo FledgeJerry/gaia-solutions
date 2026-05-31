@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 type Contact = { id: string; name: string } | null;
 type Org = { id: string; name: string } | null;
@@ -46,8 +47,16 @@ const PREV_STATUS: Record<string, string> = {
   SPRINT: "BACKLOG", IN_PROGRESS: "SPRINT", REVIEW: "IN_PROGRESS", DONE: "REVIEW",
 };
 
+const TIME_CATS = ["DEVELOPMENT", "DESIGN", "MEETING", "OPS", "RESEARCH", "OTHER"] as const;
+const CAT_LABEL: Record<string, string> = { DEVELOPMENT: "Dev", DESIGN: "Design", MEETING: "Meeting", OPS: "Ops", RESEARCH: "Research", OTHER: "Other" };
+
+type TimeEntry = { id: string; date: string; hours: number; category: string; notes: string | null; user: { id: string; name: string | null } };
+
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+
 export default function BoardKanban({ stories: initial }: { stories: Story[] }) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [stories, setStories] = useState<Story[]>(initial);
   const [editing, setEditing] = useState<Story | null>(null);
   const [orgs, setOrgs] = useState<OrgOption[]>([]);
@@ -55,6 +64,11 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
   const [form, setForm] = useState({ title: "", type: "", status: "", points: 1, blocked: false, flagged: false, orgId: "", contactId: "" });
   const [saving, setSaving] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [timeOpen, setTimeOpen] = useState(false);
+  const [timeForm, setTimeForm] = useState({ date: todayStr(), hours: "", category: "DEVELOPMENT", notes: "" });
+  const [timeSaving, setTimeSaving] = useState(false);
+  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
+  const [timeError, setTimeError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -73,6 +87,10 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
 
   function openEdit(story: Story) {
     setEditing(story);
+    setTimeOpen(false);
+    setTimeError(null);
+    setTimeForm({ date: todayStr(), hours: "", category: "DEVELOPMENT", notes: "" });
+    setTimeEntries([]);
     setForm({
       title: story.title,
       type: story.type,
@@ -83,6 +101,35 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
       orgId: story.org?.id ?? "",
       contactId: story.contact?.id ?? "",
     });
+    fetch(`/api/time?storyId=${story.id}&weeks=52`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setTimeEntries(data); })
+      .catch(() => {});
+  }
+
+  async function logTime(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editing || !timeForm.hours || parseFloat(timeForm.hours) <= 0) return;
+    setTimeSaving(true); setTimeError(null);
+    try {
+      const res = await fetch("/api/time", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...timeForm,
+          hours: parseFloat(timeForm.hours),
+          storyId: editing.id,
+          orgId: form.orgId || editing.org?.id || "",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setTimeError(data.error ?? "Error"); }
+      else {
+        setTimeEntries(prev => [data, ...prev]);
+        setTimeForm(f => ({ ...f, hours: "", notes: "" }));
+        setTimeOpen(false);
+      }
+    } catch { setTimeError("Network error"); }
+    setTimeSaving(false);
   }
 
   function setF(field: string, value: string | number | boolean) {
@@ -281,6 +328,59 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
                   <span style={{ ...mono, fontSize: "0.58rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--clay)" }}>Flagged</span>
                 </label>
               </div>
+            </div>
+
+            {/* Time section */}
+            <div style={{ borderTop: "1px solid var(--rule)", flexShrink: 0 }}>
+              <button
+                onClick={() => setTimeOpen(o => !o)}
+                style={{ ...mono, width: "100%", padding: "0.65rem 1.25rem", fontSize: "0.60rem", letterSpacing: "0.10em", textTransform: "uppercase", background: "none", border: "none", cursor: "pointer", textAlign: "left", color: "var(--moss)", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              >
+                <span>Log time {timeEntries.length > 0 && `· ${timeEntries.reduce((s, e) => s + e.hours, 0).toFixed(1)}h logged`}</span>
+                <span style={{ fontSize: "0.72rem" }}>{timeOpen ? "▲" : "▼"}</span>
+              </button>
+              {timeOpen && (
+                <div style={{ padding: "0 1.25rem 1rem" }}>
+                  <form onSubmit={logTime} style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                      <div>
+                        <label style={lblCss}>Date</label>
+                        <input type="date" style={fieldCss} value={timeForm.date} onChange={e => setTimeForm(f => ({ ...f, date: e.target.value }))} required />
+                      </div>
+                      <div>
+                        <label style={lblCss}>Hours</label>
+                        <input type="number" step="0.25" min="0.25" max="24" style={fieldCss} placeholder="e.g. 1.5" value={timeForm.hours} onChange={e => setTimeForm(f => ({ ...f, hours: e.target.value }))} required />
+                      </div>
+                    </div>
+                    <div>
+                      <label style={lblCss}>Category</label>
+                      <select style={fieldCss} value={timeForm.category} onChange={e => setTimeForm(f => ({ ...f, category: e.target.value }))}>
+                        {TIME_CATS.map(c => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={lblCss}>Notes (optional)</label>
+                      <input type="text" style={fieldCss} placeholder="What did you do?" value={timeForm.notes} onChange={e => setTimeForm(f => ({ ...f, notes: e.target.value }))} />
+                    </div>
+                    {timeError && <p style={{ ...mono, fontSize: "0.62rem", color: "var(--status-block)" }}>{timeError}</p>}
+                    <button type="submit" disabled={timeSaving} style={{ ...mono, fontSize: "0.60rem", letterSpacing: "0.08em", background: "var(--fern)", color: "#fff", border: "none", cursor: "pointer", padding: "0.4rem 0.75rem", textTransform: "uppercase", alignSelf: "flex-start" }}>
+                      {timeSaving ? "Saving…" : "Log"}
+                    </button>
+                  </form>
+                  {timeEntries.length > 0 && (
+                    <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                      {timeEntries.slice(0, 5).map(te => (
+                        <div key={te.id} style={{ display: "flex", gap: "0.5rem", alignItems: "center", padding: "0.35rem 0.5rem", background: "var(--field)", borderRadius: 2 }}>
+                          <span style={{ ...mono, fontSize: "0.62rem", color: "var(--moss)", fontWeight: 600 }}>{te.hours}h</span>
+                          <span style={{ ...mono, fontSize: "0.60rem", color: "var(--sage)" }}>{CAT_LABEL[te.category] ?? te.category}</span>
+                          {te.user.name && <span style={{ ...mono, fontSize: "0.58rem", color: "var(--lichen)" }}>{te.user.name}</span>}
+                          {te.notes && <span style={{ fontSize: "0.68rem", color: "var(--bark)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{te.notes}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Drawer footer */}

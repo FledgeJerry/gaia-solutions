@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   const isAdmin = session.user.role === "ADMIN";
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
+  const storyId = searchParams.get("storyId");
   const weeks = parseInt(searchParams.get("weeks") ?? "4", 10);
 
   const since = new Date();
@@ -16,7 +17,9 @@ export async function GET(req: NextRequest) {
 
   const entries = await prisma.timeEntry.findMany({
     where: {
-      userId: isAdmin && userId ? userId : isAdmin && !userId ? undefined : session.user.id,
+      ...(storyId ? { storyId } : {
+        userId: isAdmin && userId ? userId : isAdmin && !userId ? undefined : session.user.id,
+      }),
       date: { gte: since },
     },
     include: { user: { select: { id: true, name: true } }, org: { select: { id: true, name: true } } },
@@ -31,7 +34,7 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { date, hours, category, notes, orgId } = body;
+  const { date, hours, category, notes, orgId, storyId } = body;
 
   if (!date || !hours || hours <= 0 || hours > 24)
     return NextResponse.json({ error: "Valid date and hours (0–24) are required." }, { status: 400 });
@@ -44,6 +47,7 @@ export async function POST(req: NextRequest) {
       category: category ?? "DEVELOPMENT",
       notes: notes?.trim() || null,
       orgId: orgId || null,
+      storyId: storyId || null,
     },
     include: { user: { select: { id: true, name: true } }, org: { select: { id: true, name: true } } },
   });

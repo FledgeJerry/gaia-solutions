@@ -162,10 +162,12 @@ model TimeEntry {
   category  TimeCategory @default(DEVELOPMENT)
   notes     String?
   orgId     String?
+  storyId   String?
   createdAt DateTime     @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  org  Org? @relation(fields: [orgId], references: [id])
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org   Org?   @relation(fields: [orgId], references: [id])
+  story Story? @relation(fields: [storyId], references: [id], onDelete: SetNull)
 }
 
 model Interaction {
@@ -209,10 +211,11 @@ model Story {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  sprint     Sprint?  @relation(fields: [sprintId], references: [id])
-  contact    Contact? @relation(fields: [contactId], references: [id])
-  org        Org?     @relation(fields: [orgId], references: [id])
-  assignedTo User?    @relation(fields: [assignedToId], references: [id])
+  sprint      Sprint?     @relation(fields: [sprintId], references: [id])
+  contact     Contact?    @relation(fields: [contactId], references: [id])
+  org         Org?        @relation(fields: [orgId], references: [id])
+  assignedTo  User?       @relation(fields: [assignedToId], references: [id])
+  timeEntries TimeEntry[]
 }
 
 model Proposal {
