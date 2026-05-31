@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import AppSignOut from "@/components/AppSignOut";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 const NAV_LINKS = [
   { href: "/app/crm", label: "CRM" },
