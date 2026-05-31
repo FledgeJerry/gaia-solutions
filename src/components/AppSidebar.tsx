@@ -7,7 +7,9 @@ const NAV = [
   { href: "/app/crm", label: "Contacts" },
   { href: "/app/companies", label: "Companies" },
   { href: "/app/board", label: "Board" },
+  { href: "/app/requests", label: "Requests" },
   { href: "/app/proposals", label: "Proposals" },
+  { href: "/app/time", label: "Time" },
 ];
 
 export default function AppSidebar() {

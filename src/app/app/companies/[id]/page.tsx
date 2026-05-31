@@ -44,6 +44,9 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
               <h1 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--ink)" }}>{org.name}</h1>
               <span style={{ ...mono, fontSize: "0.58rem", color: TYPE_COLORS[org.type] ?? "#aaa", letterSpacing: "0.08em" }}>{org.type}</span>
             </div>
+            <Link href={`/app/companies/${org.id}/portal`} style={{ ...mono, fontSize: "0.60rem", color: "var(--moss)", textDecoration: "none", display: "inline-block", marginTop: "0.3rem" }}>
+              Preview client portal →
+            </Link>
             {org.website && (
               <a href={org.website} target="_blank" rel="noopener noreferrer" style={{ ...mono, fontSize: "0.68rem", color: "#888", textDecoration: "none" }}>
                 {org.website.replace(/^https?:\/\//, "")}

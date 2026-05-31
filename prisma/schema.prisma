@@ -65,6 +65,13 @@ enum StoryType {
   GOVERNANCE
 }
 
+enum StoryRequestStatus {
+  PENDING
+  REVIEWED
+  CONVERTED
+  DECLINED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -75,12 +82,13 @@ model User {
   contactId     String?   @unique
   createdAt     DateTime  @default(now())
 
-  accounts      Account[]
-  sessions      Session[]
-  interactions  Interaction[]
-  stories       Story[]
-  timeEntries   TimeEntry[]
-  contact       Contact?  @relation(fields: [contactId], references: [id])
+  accounts       Account[]
+  sessions       Session[]
+  interactions   Interaction[]
+  stories        Story[]
+  timeEntries    TimeEntry[]
+  storyRequests  StoryRequest[]
+  contact        Contact?  @relation(fields: [contactId], references: [id])
 }
 
 model Account {
@@ -126,10 +134,11 @@ model Org {
   website   String?
   createdAt DateTime @default(now())
 
-  contacts    Contact[]
-  stories     Story[]
-  proposals   Proposal[]
-  timeEntries TimeEntry[]
+  contacts      Contact[]
+  stories       Story[]
+  proposals     Proposal[]
+  timeEntries   TimeEntry[]
+  storyRequests StoryRequest[]
 }
 
 model Contact {
@@ -211,11 +220,28 @@ model Story {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  sprint      Sprint?     @relation(fields: [sprintId], references: [id])
-  contact     Contact?    @relation(fields: [contactId], references: [id])
-  org         Org?        @relation(fields: [orgId], references: [id])
-  assignedTo  User?       @relation(fields: [assignedToId], references: [id])
-  timeEntries TimeEntry[]
+  sprint        Sprint?       @relation(fields: [sprintId], references: [id])
+  contact       Contact?      @relation(fields: [contactId], references: [id])
+  org           Org?          @relation(fields: [orgId], references: [id])
+  assignedTo    User?         @relation(fields: [assignedToId], references: [id])
+  timeEntries   TimeEntry[]
+  storyRequest  StoryRequest?
+}
+
+model StoryRequest {
+  id            String             @id @default(cuid())
+  title         String
+  description   String?
+  orgId         String?
+  submittedById String?
+  status        StoryRequestStatus @default(PENDING)
+  convertedToId String?            @unique
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  org         Org?     @relation(fields: [orgId], references: [id])
+  submittedBy User?    @relation(fields: [submittedById], references: [id])
+  convertedTo Story?   @relation(fields: [convertedToId], references: [id])
 }
 
 model Proposal {
