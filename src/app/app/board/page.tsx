@@ -10,10 +10,11 @@ export default async function BoardPage() {
         contact: { select: { id: true, name: true } },
         org: { select: { id: true, name: true } },
         assignedTo: { select: { id: true, name: true } },
+        sprint: { select: { id: true, number: true } },
       },
       orderBy: { updatedAt: "desc" },
     }),
-    prisma.sprint.findMany({ orderBy: { number: "desc" }, take: 5 }),
+    prisma.sprint.findMany({ orderBy: { number: "desc" } }),
   ]);
 
   const activeSprint = sprints.find(s => {
@@ -34,7 +35,10 @@ export default async function BoardPage() {
             <h1 className="t-display-sm">Board</h1>
             <p className="t-label" style={{ marginTop: "0.2rem" }}>{stories.length} stories</p>
           </div>
-          <Link href="/app/board/new" className="btn btn-solid" style={{ padding: "0.5rem 1rem" }}>+ Add story</Link>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <Link href="/app/sprints" className="btn" style={{ padding: "0.5rem 1rem" }}>Manage sprints</Link>
+            <Link href="/app/board/new" className="btn btn-solid" style={{ padding: "0.5rem 1rem" }}>+ Add story</Link>
+          </div>
         </div>
 
         {/* Sprint bar */}
@@ -49,7 +53,7 @@ export default async function BoardPage() {
         )}
 
         {/* Kanban */}
-        <BoardKanban stories={stories} />
+        <BoardKanban stories={stories} sprints={sprints.map(s => ({ id: s.id, number: s.number }))} />
       </div>
     </div>
   );

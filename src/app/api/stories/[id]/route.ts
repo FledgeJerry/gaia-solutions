@@ -26,6 +26,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     include: {
       contact: { select: { id: true, name: true } },
       org: { select: { id: true, name: true } },
+      sprint: { select: { id: true, number: true } },
     },
   });
   return NextResponse.json(story);

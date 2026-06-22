@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 type Contact = { id: string; name: string } | null;
 type Org = { id: string; name: string } | null;
 type User = { id: string; name: string | null } | null;
+type Sprint = { id: string; number: number } | null;
 
 type Story = {
   id: string;
@@ -19,10 +20,12 @@ type Story = {
   contact: Contact;
   org: Org;
   assignedTo: User;
+  sprint: Sprint;
 };
 
 type OrgOption = { id: string; name: string };
 type ContactOption = { id: string; name: string };
+type SprintOption = { id: string; number: number };
 
 const COLUMNS = [
   { key: "BACKLOG",     label: "Backlog" },
@@ -54,14 +57,14 @@ type TimeEntry = { id: string; date: string; hours: number; category: string; no
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 
-export default function BoardKanban({ stories: initial }: { stories: Story[] }) {
+export default function BoardKanban({ stories: initial, sprints }: { stories: Story[]; sprints: SprintOption[] }) {
   const router = useRouter();
   const { data: session } = useSession();
   const [stories, setStories] = useState<Story[]>(initial);
   const [editing, setEditing] = useState<Story | null>(null);
   const [orgs, setOrgs] = useState<OrgOption[]>([]);
   const [contacts, setContacts] = useState<ContactOption[]>([]);
-  const [form, setForm] = useState({ title: "", type: "", status: "", points: 1, blocked: false, flagged: false, orgId: "", contactId: "" });
+  const [form, setForm] = useState({ title: "", type: "", status: "", points: 1, blocked: false, flagged: false, orgId: "", contactId: "", sprintId: "" });
   const [saving, setSaving] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [timeOpen, setTimeOpen] = useState(false);
@@ -100,6 +103,7 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
       flagged: story.flagged,
       orgId: story.org?.id ?? "",
       contactId: story.contact?.id ?? "",
+      sprintId: story.sprint?.id ?? "",
     });
     fetch(`/api/time?storyId=${story.id}&weeks=52`)
       .then(r => r.json())
@@ -226,9 +230,9 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
 
                       <p style={{ fontSize: "0.78rem", fontWeight: 500, color: "var(--soil)", lineHeight: 1.35, marginBottom: "0.35rem" }}>{story.title}</p>
 
-                      {(story.contact || story.org) && (
+                      {(story.contact || story.org || story.sprint) && (
                         <p style={{ ...mono, fontSize: "0.60rem", color: "var(--clay)", marginBottom: "0.35rem" }}>
-                          {story.contact?.name ?? story.org?.name}
+                          {[story.contact?.name ?? story.org?.name, story.sprint && `Sprint ${story.sprint.number}`].filter(Boolean).join(" · ")}
                         </p>
                       )}
 
@@ -300,6 +304,14 @@ export default function BoardKanban({ stories: initial }: { stories: Story[] }) 
               <div>
                 <label style={lblCss}>Points</label>
                 <input type="number" min="1" max="13" style={{ ...fieldCss, width: "80px" }} value={form.points} onChange={e => setF("points", parseInt(e.target.value) || 1)} />
+              </div>
+
+              <div>
+                <label style={lblCss}>Sprint</label>
+                <select style={fieldCss} value={form.sprintId} onChange={e => setF("sprintId", e.target.value)}>
+                  <option value="">— backlog / unassigned —</option>
+                  {sprints.map(s => <option key={s.id} value={s.id}>Sprint {s.number}</option>)}
+                </select>
               </div>
 
               <div>
