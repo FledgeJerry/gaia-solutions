@@ -44,13 +44,13 @@ export default async function SprintsPage() {
               const isActive = sprint.startDate <= now && sprint.endDate >= now;
               return (
                 <div key={sprint.id} style={{ display: "grid", gridTemplateColumns: "70px 1fr 140px 140px 70px 70px 60px", gap: "1px", background: "var(--rule)" }}>
-                  <div style={{ background: "var(--warm-white)", padding: "0.65rem 0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <Link href={`/app/sprints/${sprint.id}`} style={{ background: "var(--warm-white)", padding: "0.65rem 0.75rem", display: "flex", alignItems: "center", gap: "0.4rem", textDecoration: "none" }}>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem", color: "var(--ink)" }}>{sprint.number}</span>
                     {isActive && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--gold)", display: "inline-block" }} title="Active" />}
-                  </div>
-                  <div style={{ background: "var(--warm-white)", padding: "0.65rem 0.75rem", display: "flex", alignItems: "center" }}>
+                  </Link>
+                  <Link href={`/app/sprints/${sprint.id}`} style={{ background: "var(--warm-white)", padding: "0.65rem 0.75rem", display: "flex", alignItems: "center", textDecoration: "none" }}>
                     <span style={{ fontSize: "0.82rem", color: "var(--ink)" }}>{sprint.focus ?? "—"}</span>
-                  </div>
+                  </Link>
                   <div style={{ background: "var(--warm-white)", padding: "0.65rem 0.75rem", display: "flex", alignItems: "center" }}>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "#666" }}>{sprint.startDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
                   </div>

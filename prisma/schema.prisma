@@ -199,6 +199,7 @@ model Sprint {
   endDate     DateTime
   focus       String?
   totalPoints Int      @default(0)
+  reflection  String?
   createdAt   DateTime @default(now())
 
   stories Story[]
