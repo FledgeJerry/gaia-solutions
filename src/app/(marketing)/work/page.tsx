@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const work = [
+  { href: "/work/urbandale-farm", category: "Community Infrastructure / Edge AI", title: "Urbandale Farm OS", body: "A community-powered farm operating system built on a Raspberry Pi, Google Coral Edge TPU, and solar power. Runs fully offline. The AI is an extra set of eyes — it surfaces observations, asks questions, and learns from the people who work the land.", featured: true, internal: true, urlLabel: "Building in public — no live URL yet" },
   { href: "https://lrc-pac.vercel.app/", category: "Civic / OSINT", title: "LRC-PAC Zoning Investigation", body: "Deep mapping of developer relationships and zoning decisions across Lansing's political landscape. Follow the money, not the narrative.", featured: true },
   { href: "https://zoning-one.vercel.app/", category: "Investigation", title: "Deep Green Relationship Map", body: "OSINT-built network graph tracing relationships between environmental orgs, funders, and policy actors." },
   { href: "https://redlining-six.vercel.app/", category: "Equity / Maps", title: "Redlined: Lansing MI", body: "Historical redlining boundaries overlaid with current housing data. The past is still the present." },
@@ -26,14 +27,26 @@ export default function WorkPage() {
         <p className="section-dek">Civic tech, investigative data, co-op infrastructure, and more.</p>
       </div>
       <div className="work-grid">
-        {work.map(w => (
-          <a key={w.href} href={w.href} target="_blank" rel="noopener noreferrer" className={`work-card${w.featured ? " work-card-featured" : ""}`} style={{ display: "flex", flexDirection: "column", textDecoration: "none" }}>
-            <p className="work-card-category">{w.category}</p>
-            <h3 className="work-card-title">{w.title}</h3>
-            <p className="work-card-body">{w.body}</p>
-            <span className="work-card-url">{w.href.replace("https://", "")} →</span>
-          </a>
-        ))}
+        {work.map(w => {
+          const cardClass = `work-card${w.featured ? " work-card-featured" : ""}`;
+          const inner = (
+            <>
+              <p className="work-card-category">{w.category}</p>
+              <h3 className="work-card-title">{w.title}</h3>
+              <p className="work-card-body">{w.body}</p>
+              <span className="work-card-url">{w.urlLabel ?? `${w.href.replace("https://", "")} →`}</span>
+            </>
+          );
+          return w.internal ? (
+            <Link key={w.href} href={w.href} className={cardClass} style={{ display: "flex", flexDirection: "column", textDecoration: "none" }}>
+              {inner}
+            </Link>
+          ) : (
+            <a key={w.href} href={w.href} target="_blank" rel="noopener noreferrer" className={cardClass} style={{ display: "flex", flexDirection: "column", textDecoration: "none" }}>
+              {inner}
+            </a>
+          );
+        })}
       </div>
     </section>
   );
