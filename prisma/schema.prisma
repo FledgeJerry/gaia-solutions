@@ -230,15 +230,17 @@ model Story {
 }
 
 model StoryRequest {
-  id            String             @id @default(cuid())
-  title         String
-  description   String?
-  orgId         String?
-  submittedById String?
-  status        StoryRequestStatus @default(PENDING)
-  convertedToId String?            @unique
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id             String             @id @default(cuid())
+  title          String
+  description    String?
+  orgId          String?
+  submittedById  String?
+  source         String?            // e.g. "resilience.foundation", "barter", "thefledge"
+  submitterEmail String?            // for anonymous cross-site submissions
+  status         StoryRequestStatus @default(PENDING)
+  convertedToId  String?            @unique
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   org         Org?     @relation(fields: [orgId], references: [id])
   submittedBy User?    @relation(fields: [submittedById], references: [id])

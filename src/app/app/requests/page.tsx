@@ -6,6 +6,7 @@ import Link from "next/link";
 
 type Request = {
   id: string; title: string; description: string | null; status: string; createdAt: string;
+  source: string | null; submitterEmail: string | null;
   org: { id: string; name: string } | null;
   submittedBy: { id: string; name: string | null; email: string } | null;
   convertedTo: { id: string; title: string; status: string } | null;
@@ -79,12 +80,18 @@ export default function RequestsPage() {
                   <div style={{ flex: 1 }}>
                     <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--ink)", marginBottom: "0.2rem" }}>{r.title}</p>
                     {r.description && <p style={{ fontSize: "0.80rem", color: "#666", lineHeight: 1.5 }}>{r.description}</p>}
-                    <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+                      {r.source && (
+                        <span style={{ ...mono, fontSize: "0.58rem", letterSpacing: "0.06em", textTransform: "uppercase", background: "#f0f4f8", color: "#6BA3BE", padding: "0.15rem 0.45rem", borderRadius: 3 }}>{r.source}</span>
+                      )}
                       {r.org && (
                         <Link href={`/app/companies/${r.org.id}`} style={{ ...mono, fontSize: "0.62rem", color: "var(--amber)", textDecoration: "none" }}>{r.org.name}</Link>
                       )}
                       {r.submittedBy && (
                         <span style={{ ...mono, fontSize: "0.62rem", color: "#aaa" }}>{r.submittedBy.name ?? r.submittedBy.email}</span>
+                      )}
+                      {r.submitterEmail && !r.submittedBy && (
+                        <span style={{ ...mono, fontSize: "0.62rem", color: "#aaa" }}>{r.submitterEmail}</span>
                       )}
                       <span style={{ ...mono, fontSize: "0.62rem", color: "#bbb" }}>
                         {new Date(r.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
